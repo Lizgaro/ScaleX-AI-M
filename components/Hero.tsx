@@ -10,110 +10,112 @@ export const Hero: React.FC = () => {
     // Track hero view
     trackEvent(ANALYTICS_EVENTS.SCROLL_DEPTH, { label: 'hero_view', value: 0 });
 
-    // --- Canvas Animation: Neural Network ---
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let w = canvas.width = window.innerWidth;
-    let h = canvas.height = window.innerHeight;
-    
-    const particles: Particle[] = [];
-    const properties = {
-      bgColor: 'rgba(3, 3, 3, 1)',
-      particleColor: 'rgba(99, 102, 241, 0.5)', // Indigo
-      particleRadius: 3,
-      particleCount: 60,
-      lineLength: 150,
-      particleLife: 6,
-    };
-
-    class Particle {
-      x: number;
-      y: number;
-      velocityX: number;
-      velocityY: number;
-      life: number;
-
-      constructor() {
-        this.x = Math.random() * w;
-        this.y = Math.random() * h;
-        this.velocityX = (Math.random() * (Math.random() < 0.5 ? -1 : 1));
-        this.velocityY = (Math.random() * (Math.random() < 0.5 ? -1 : 1));
-        this.life = Math.random() * properties.particleLife * 60;
-      }
-
-      position() {
-        this.x + this.velocityX > w && this.velocityX > 0 || this.x + this.velocityX < 0 && this.velocityX < 0 ? this.velocityX *= -1 : this.velocityX;
-        this.y + this.velocityY > h && this.velocityY > 0 || this.y + this.velocityY < 0 && this.velocityY < 0 ? this.velocityY *= -1 : this.velocityY;
-        this.x += this.velocityX;
-        this.y += this.velocityY;
-      }
-
-      reDraw() {
-        if (!ctx) return;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, Math.random() * 2, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.fillStyle = properties.particleColor;
-        ctx.fill();
-      }
-    }
-
-    const initParticles = () => {
-      for (let i = 0; i < properties.particleCount; i++) {
-        particles.push(new Particle());
-      }
-    };
-
-    const drawLines = () => {
-        if(!ctx) return;
-        let x1, y1, x2, y2, length, opacity;
-        for(let i in particles) {
-            for(let j in particles) {
-                x1 = particles[i].x;
-                y1 = particles[i].y;
-                x2 = particles[j].x;
-                y2 = particles[j].y;
-                length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-                if(length < properties.lineLength) {
-                    opacity = 1 - length / properties.lineLength;
-                    ctx.lineWidth = 0.5;
-                    ctx.strokeStyle = `rgba(168, 85, 247, ${opacity})`; // Purple lines
-                    ctx.beginPath();
-                    ctx.moveTo(x1, y1);
-                    ctx.lineTo(x2, y2);
-                    ctx.closePath();
-                    ctx.stroke();
-                }
-            }
-        }
-    };
-
-    const loop = () => {
+    if (typeof window !== 'undefined') {
+      // --- Canvas Animation: Neural Network ---
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       if (!ctx) return;
-      ctx.fillStyle = properties.bgColor;
-      ctx.fillRect(0, 0, w, h);
-      
-      for (let i = 0; i < particles.length; i++) {
-        particles[i].position();
-        particles[i].reDraw();
+
+      let w = canvas.width = window.innerWidth;
+      let h = canvas.height = window.innerHeight;
+
+      const particles: Particle[] = [];
+      const properties = {
+        bgColor: 'rgba(3, 3, 3, 1)',
+        particleColor: 'rgba(99, 102, 241, 0.5)', // Indigo
+        particleRadius: 3,
+        particleCount: 60,
+        lineLength: 150,
+        particleLife: 6,
+      };
+
+      class Particle {
+        x: number;
+        y: number;
+        velocityX: number;
+        velocityY: number;
+        life: number;
+
+        constructor() {
+          this.x = Math.random() * w;
+          this.y = Math.random() * h;
+          this.velocityX = (Math.random() * (Math.random() < 0.5 ? -1 : 1));
+          this.velocityY = (Math.random() * (Math.random() < 0.5 ? -1 : 1));
+          this.life = Math.random() * properties.particleLife * 60;
+        }
+
+        position() {
+          this.x + this.velocityX > w && this.velocityX > 0 || this.x + this.velocityX < 0 && this.velocityX < 0 ? this.velocityX *= -1 : this.velocityX;
+          this.y + this.velocityY > h && this.velocityY > 0 || this.y + this.velocityY < 0 && this.velocityY < 0 ? this.velocityY *= -1 : this.velocityY;
+          this.x += this.velocityX;
+          this.y += this.velocityY;
+        }
+
+        reDraw() {
+          if (!ctx) return;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, Math.random() * 2, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.fillStyle = properties.particleColor;
+          ctx.fill();
+        }
       }
-      drawLines();
-      requestAnimationFrame(loop);
-    };
 
-    initParticles();
-    loop();
+      const initParticles = () => {
+        for (let i = 0; i < properties.particleCount; i++) {
+          particles.push(new Particle());
+        }
+      };
 
-    const handleResize = () => {
-        w = canvas.width = window.innerWidth;
-        h = canvas.height = window.innerHeight;
-    };
+      const drawLines = () => {
+          if(!ctx) return;
+          let x1, y1, x2, y2, length, opacity;
+          for(let i in particles) {
+              for(let j in particles) {
+                  x1 = particles[i].x;
+                  y1 = particles[i].y;
+                  x2 = particles[j].x;
+                  y2 = particles[j].y;
+                  length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+                  if(length < properties.lineLength) {
+                      opacity = 1 - length / properties.lineLength;
+                      ctx.lineWidth = 0.5;
+                      ctx.strokeStyle = `rgba(168, 85, 247, ${opacity})`; // Purple lines
+                      ctx.beginPath();
+                      ctx.moveTo(x1, y1);
+                      ctx.lineTo(x2, y2);
+                      ctx.closePath();
+                      ctx.stroke();
+                  }
+              }
+          }
+      };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+      const loop = () => {
+        if (!ctx) return;
+        ctx.fillStyle = properties.bgColor;
+        ctx.fillRect(0, 0, w, h);
+
+        for (let i = 0; i < particles.length; i++) {
+          particles[i].position();
+          particles[i].reDraw();
+        }
+        drawLines();
+        requestAnimationFrame(loop);
+      };
+
+      initParticles();
+      loop();
+
+      const handleResize = () => {
+          w = canvas.width = window.innerWidth;
+          h = canvas.height = window.innerHeight;
+      };
+
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
 
   }, []);
 
